@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <title>仿照饿了么左右联动</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .header{
+            width: 100%;
+            height: 150px;
+            background: #555;
+        }
+        .swiper-container-ul{
+            list-style: none;
+            overflow: hidden;
+            width: 100%;
+            background: #fff;
+            top: 0;
+        }
+        .swiper-container-ul-li{
+            width: 50%;
+            height: 40px;
+            line-height: 40px;
+            float: left;
+            text-align: center;
+        }
+        .actives{
+            border-bottom: 1px solid #3190e8;
+            color: #3190e8;
+        }
+        .content{
+            width: 100%;
+            overflow: hidden;
+        }
+        .left{
+            top: 41px;
+            float: left;
+            width: 25%;
+            height: 100%;
+            background: #eee;
+        }
+        .left ul{
+            list-style: none;
+        }
+        .left ul li{
+            padding: 15px 5px;
+            text-align: center;
+        }
+        .active{
+            background: #fff;
+            border-left: 2px solid #3190e8;
+        }
+        .right{
+            float: left;
+            width: 75%;
+            height: 100%;
+        }
+        .right ul{
+            list-style: none;
+        }
+        .class-title{
+            padding: 7px 10px;
+            background: #eee;
+        }
+        .item{
+            overflow: hidden;
+            width: 100%;
+            padding: 10px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+        .item-left{
+            float: left;
+        }
+        .item-right{
+            float: left;
+            padding: 0 10px;
+        }
+        .item-img{
+            width: 100px;
+            height: 100px;
+            background: #eee;
+        }
+        .title{
+            width: 100px;
+            height: 20px;
+            margin-top: 10px;
+            background: #eee;
+        }
+        .subtitle{
+            width: 70px;
+            height: 20px;
+            margin-top: 10px;
+            background: #eee;
+        }
+        .price{
+            width: 50px;
+            height: 20px;
+            margin-top: 10px;
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+<body>
+<div class="header"></div>
+<div class="swiper-container">
+    <!-- 商品 <-> 详情 -->
+    <ul class="swiper-container-ul">
+        <li class="swiper-container-ul-li actives">商品</li>
+        <li class="swiper-container-ul-li">详情</li>
+    </ul>
+
+    <!---->
+    <div class="swiper-wrapper">
+        <div class="content">
+            <!--左侧-->
+            <div class="left" id="left">
+                <ul>
+                    <li v-for="item in items">{{item.name}}</li>
+                </ul>
+            </div>
+            -
+            <!--右侧-->
+            <div class="right" id="right">
+                <ul>
+                    <li v-for="item in items">{{item.name}}
+                        <div class="class-title">{{item.class}}</div>
+                        <div v-for="ite in item.list">
+                            <div class="item">
+                                <div class="item-left">
+                                    <div class="item-img"></div>
+                                </div>
+                                <div class="item-right">
+                                    <div class="title">{{ite.title}}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    $(function () {
+        $('.content').css('height',$('right').height)
+        $('.left ul li').eq(0).addClass('active');
+
+        $(window).scroll(function () {
+            // 这里在滚动的时候做监听,如果翻上去的部分超过150的时候，切换商品和左侧这里做绝对定位，然后右侧的margin-left设置成左侧的宽度
+
+            if($(window).scrollTop()>= 150){
+                $('.swiper-container-ul').css('position','fixed');
+                $('.left').css('position','fixed')
+                $('.right').css('margin-left',$('.left').width());
+            }else{
+                $('.swiper-container-ul').css('position','')
+                $('.left').css('position','')
+                $('.right').css('margin-left','')
+            }
+
+            // 获取右侧当前li距离顶端的高度 - 右侧已经翻上去的高度 - head的高度
+            $('.right ul li').each(function () {
+                var target = parseInt($(this).offset().top - $(window).scrollTop() - 150)
+                console.log($(this))
+                var i = $(this).index()
+
+                // if target<=0 清除所又li的active, 给当前li赋予active
+
+                if(target<=0){
+                    $('.left ul li').removeClass('active');
+                    $('.left ul li').eq(i).addClass('active')
+                }
+            })
+        })
+
+
+        // 点击左侧li通过下标找到相应li的位置，通过animate滚动到相应的位置
+        $('.left ul li').click(function () {
+            var i = $(this).index('.left ul li')
+            $('body,html').animate({scrollTop: $('.right ul li').eq(i).offset().top-40},1000)
+        })
+    })
+</script>
+<script>
+    var left = new Vue({
+        el: '#left',
+        data: {
+            items: [
+                { name : '分类1' },
+                { name : '分类2' },
+                { name : '分类3' },
+                { name : '分类4' },
+                { name : '分类5' },
+                { name : '分类6' },
+                { name : '分类7' },
+                { name : '分类8' }
+            ]
+        }
+    });
+    var right = new Vue({
+        el: '#right',
+        data: {
+            items: [
+                { class : '分类1',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类2',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类3',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类4',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类5',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类6',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类7',list : [ { title : '1' },{ title : '2' } ] },
+                { class : '分类8',list : [ { title : '1' },{ title : '2' } ] }
+            ]
+        }
+    });
+</script>
+</html>
